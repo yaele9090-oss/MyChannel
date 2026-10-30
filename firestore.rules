@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function admin() { return signedIn() && request.auth.token.email == 'you@gmail.com'; } // <-- המייל שלך
+    function viewPath(id) { return /databases/$(database)/documents/posts/$(id)/views/$(request.auth.uid); }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+
+    match /posts/{id} {
+      allow read: if signedIn();
+      allow create, delete: if admin();
+      // מונים ציבוריים: כל מחובר יכול רק להעלות צפייה ב-1 (פעם אחת) או לעדכן מונה תגובות
+      allow update: if admin() || (signedIn() && (
+        (changed().hasOnly(['vc'])
+          && request.resource.data.vc == resource.data.get('vc', 0) + 1
+          && !exists(viewPath(id)) && existsAfter(viewPath(id)))
+        || (changed().hasOnly(['rc']) && request.resource.data.rc.size() < 80)));
+
+      // המיילים נשמרים כאן, ורק המנהל יכול לקרוא
+      match /views/{uid} {
+        allow create: if signedIn() && request.auth.uid == uid;
+        allow read: if admin();
+      }
+      match /reactions/{uid} {
+        allow read: if admin() || (signedIn() && request.auth.uid == uid);
+        allow create, update: if signedIn() && request.auth.uid == uid
+                              && request.resource.data.emoji is string
+                              && request.resource.data.emoji.size() <= 16;
+        allow delete: if signedIn() && request.auth.uid == uid;
+      }
+    }
+    match /visitors/{uid} {
+      allow create, update: if signedIn() && request.auth.uid == uid;
+      allow read: if admin() || (signedIn() && request.auth.uid == uid);
+    }
+  }
+}

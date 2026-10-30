@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הערוץ שלי</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eaf0f3;--card:#fff;--ink:#13303b;--mut:#5d7580;--acc:#0b7a85;--line:#d5e0e5}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Heebo,Arial,sans-serif;line-height:1.55}
+header{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
+header h1{margin:0;font-size:20px;font-weight:800;flex:1}
+header img{width:32px;height:32px;border-radius:50%}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:var(--acc);color:#fff;font-weight:500}
+button.ghost{background:transparent;color:inherit;border:1px solid currentColor}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+main{max-width:620px;margin:0 auto;padding:16px}
+#login{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+#login h2{font-size:34px;margin:0;font-weight:800}
+#login small{color:var(--mut)}
+.card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+.meta{color:var(--mut);font-size:13px}
+.txt{white-space:pre-wrap;font-size:17px;margin:6px 0 10px}
+.card img.m,.card video.m{width:100%;max-height:70vh;border-radius:10px;background:#000;object-fit:contain}
+iframe.m{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
+.rx{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.rx button{background:#f1f6f8;color:var(--ink);border:1px solid var(--line);padding:4px 10px}
+.rx button.on{background:#d3eef0;border-color:var(--acc)}
+.st{display:flex;gap:12px;margin-top:10px;font-size:14px;color:var(--mut);align-items:center;flex-wrap:wrap}
+.st button{background:transparent;color:var(--mut);border:1px solid var(--line);padding:2px 10px;font-size:13px}
+textarea,.in{width:100%;font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px}
+textarea{min-height:80px;resize:vertical}
+.ei{flex:1;min-width:150px;font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px}
+.row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+#modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+#modal>div{background:#fff;border-radius:14px;max-width:520px;width:100%;max-height:80vh;overflow:auto;padding:18px}
+#modal li{padding:4px 0;border-bottom:1px solid var(--line);font-size:14px}
+ul{padding:0;list-style:none;margin:6px 0 14px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.tabs button.on{background:var(--ink);color:#fff}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">הערוץ שלי</h1>
+  <img id="avatar" alt="" hidden>
+  <button class="ghost" id="out" hidden>יציאה</button>
+</header>
+<main>
+  <section id="login" hidden>
+    <h2>הערוץ שלי</h2>
+    <p>כדי לצפות בעדכונים, התחבר עם חשבון גוגל.</p>
+    <button id="in">התחברות עם Google</button>
+    <small>בכניסה נשמרים כתובת המייל שלך וצפיות בעדכונים, ורק מנהל הערוץ רואה אותם.</small>
+  </section>
+  <section id="app" hidden>
+    <div class="tabs" id="tabs" hidden>
+      <button class="on" data-t="feed">הערוץ</button>
+      <button data-t="vis">מי נכנס</button>
+    </div>
+    <div id="compose" class="card" hidden>
+      <textarea id="text" placeholder="כתוב עדכון חדש..."></textarea>
+      <div class="row">
+        <input class="in" id="link" style="flex:1" placeholder="קישור לתמונה או סרטון (דרייב / יוטיוב) - לא חובה" dir="ltr">
+        <select id="mtype" class="in" style="width:auto"><option value="video">סרטון</option><option value="image">תמונה</option></select>
+      </div>
+      <div class="row"><button id="pub" style="margin-inline-start:auto">פרסום</button></div>
+    </div>
+    <p id="empty" class="meta" hidden>עדיין אין עדכונים.</p>
+    <div id="feed"></div>
+    <div id="visitors" hidden></div>
+  </section>
+</main>
+<div id="modal"><div id="mbody"></div></div>
+
+<script type="module">
+ import {initializeApp} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+import {getFirestore,collection,doc,getDoc,setDoc,addDoc,deleteDoc,getDocs,onSnapshot,query,orderBy,limit,serverTimestamp,increment,writeBatch,FieldPath} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+/* ====== ססמאות====== */
+const firebaseConfig = {
+  apiKey: "AIzaSyD_MsRdNkGuebM8QSQ5R1Pv1p5l36kK_wA",
+  authDomain: "my-channel-21a1e.firebaseapp.com",
+  projectId: "my-channel-21a1e",
+  storageBucket: "my-channel-21a1e.firebasestorage.app",
+  messagingSenderId: "723883686401",
+  appId: "1:723883686401:web:9f196711bbb4f6917ede00",
+  measurementId: "G-EXN3F37WC8"
+};
+const ADMIN_EMAIL = "yaele9090@gmail.com";   // חייב להיות זהה לקובץ firestore.rules
+const CHANNEL_NAME = "הערוץ שלי";
+const EMOJIS = ["👍","❤️","😂","😮","🙏"];
+const MORE = ["😀","😁","😅","🤣","😍","🥰","😘","😎","🤩","🥳","😢","😭","😡","🤔","🙄","😴","🤯","😇","🤗","🙌","👏","💪","🤝","✌️","👌","🔥","✨","🎉","💯","💔","💙","💚","🌹","⭐","🌟","☀️","🌈","🍎","☕","🎁","🙈"];
+/* ===================== */
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app), db = getFirestore(app);
+const $ = id => document.getElementById(id);
+const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); kids.forEach(k => e.append(k)); return e; };
+const fmt = t => t?.toDate ? t.toDate().toLocaleString("he-IL") : "עכשיו";
+let me = null, isAdmin = false, unsubFeed = null; const cards = new Map();
+document.title = CHANNEL_NAME; $("title").textContent = CHANNEL_NAME;
+
+/* מונים ציבוריים: בלי מיילים */
+const stats = p => {
+  const rx = Object.entries(p.rc || {}).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).map(([e, n]) => `${e} ${n}`).join("  ");
+  return `👁 ${Math.max(0, p.vc || 0)}` + (rx ? "   " + rx : "");
+};
+
+/* מדיה: דרייב, יוטיוב או קישור ישיר */
+function mediaEl(p) {
+  const u = p.media; if (!u || !/^https:\/\//.test(u)) return null;
+  const yt = u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
+  if (yt) return el("iframe", {className: "m", src: `https://www.youtube-nocookie.com/embed/${yt[1]}`, allowFullscreen: true, loading: "lazy"});
+  const dr = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([\w-]+)/) || (u.includes("drive.google.com") && u.match(/[?&]id=([\w-]+)/));
+  if (dr) return p.mtype === "image"
+    ? el("img", {className: "m", src: `https://drive.google.com/thumbnail?id=${dr[1]}&sz=w1600`, loading: "lazy", alt: ""})
+    : el("iframe", {className: "m", src: `https://drive.google.com/file/d/${dr[1]}/preview`, allowFullscreen: true, loading: "lazy"});
+  return p.mtype === "video" ? el("video", {className: "m", src: u, controls: true, preload: "metadata"}) : el("img", {className: "m", src: u, loading: "lazy", alt: ""});
+}
+
+$("in").onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert("ההתחברות נכשלה: " + e.message));
+$("out").onclick = () => signOut(auth);
+
+const seenKey = () => "seen_" + me.uid;
+const getSeen = () => { try { return new Set(JSON.parse(localStorage.getItem(seenKey()) || "[]")); } catch { return new Set(); } };
+const putSeen = s => { try { localStorage.setItem(seenKey(), JSON.stringify([...s])); } catch {} };
+
+const io = new IntersectionObserver(entries => entries.forEach(en => {
+  if (!en.isIntersecting || !me) return;
+  const id = en.target.dataset.id, s = getSeen();
+  io.unobserve(en.target);
+  if (s.has(id)) return; s.add(id); putSeen(s);
+  const b = writeBatch(db);
+  b.set(doc(db, "posts", id, "views", me.uid), {email: me.email, name: me.displayName || "", at: serverTimestamp()});
+  b.update(doc(db, "posts", id), {vc: increment(1)});
+  b.commit().catch(() => {});
+}), {threshold: 0.6});
+
+function cleanup() {
+  unsubFeed && unsubFeed(); unsubFeed = null;
+  cards.forEach(c => c._u && c._u()); cards.clear();
+  io.disconnect(); $("feed").replaceChildren();
+}
+
+onAuthStateChanged(auth, async user => {
+  cleanup(); me = user;
+  $("login").hidden = !!user; $("app").hidden = !user; $("out").hidden = !user; $("avatar").hidden = !user;
+  if (!user) return;
+  isAdmin = user.email === ADMIN_EMAIL;
+  $("avatar").src = user.photoURL || "";
+  $("compose").hidden = !isAdmin; $("tabs").hidden = !isAdmin;
+  try {
+    const vref = doc(db, "visitors", user.uid);
+    const first = !(await getDoc(vref)).exists();
+    await setDoc(vref, {email: user.email, name: user.displayName || "", lastSeen: serverTimestamp(), visits: increment(1), ...(first ? {firstSeen: serverTimestamp()} : {})}, {merge: true});
+  } catch {}
+  startFeed();
+});
+
+function startFeed() {
+  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(30));
+  unsubFeed = onSnapshot(q, snap => {
+    const feed = $("feed");
+    snap.docChanges().forEach(ch => {
+      const id = ch.doc.id, p = ch.doc.data();
+      if (ch.type === "added") { const c = card(id, p); cards.set(id, c); feed.insertBefore(c, feed.children[ch.newIndex] || null); }
+      else if (ch.type === "modified") { const c = cards.get(id); if (c) { c._st.textContent = stats(p); c._d.textContent = fmt(p.createdAt); } }
+      else { const c = cards.get(id); if (c) { c._u && c._u(); io.unobserve(c); c.remove(); cards.delete(id); } }
+    });
+    $("empty").hidden = cards.size > 0;
+  }, err => $("feed").replaceChildren(el("p", {className: "meta", textContent: err.code === "resource-exhausted" ? "הערוץ הגיע למכסה היומית. נסו שוב מאוחר יותר." : "שגיאה בטעינה: " + err.message})));
+}
+
+function card(id, p) {
+  const c = el("article", {className: "card"}); c.dataset.id = id;
+  c._d = el("div", {className: "meta", textContent: fmt(p.createdAt)}); c.append(c._d);
+  if (p.text) c.append(el("div", {className: "txt", textContent: p.text}));
+  const m = mediaEl(p); if (m) c.append(m);
+
+  const rx = el("div", {className: "rx"}), panel = el("div", {className: "rx", hidden: true});
+  const postRef = doc(db, "posts", id), myref = doc(db, "posts", id, "reactions", me.uid);
+  let mine = null;
+  const pick = e => {
+    e = e.trim();
+    if (!e || e.length > 16 || !/\p{Extended_Pictographic}/u.test(e)) return;
+    const b = writeBatch(db);
+    if (mine === e) { b.delete(myref); b.update(postRef, new FieldPath("rc", e), increment(-1)); }
+    else {
+      b.set(myref, {emoji: e, email: me.email, name: me.displayName || "", at: serverTimestamp()});
+      if (mine) b.update(postRef, new FieldPath("rc", mine), increment(-1), new FieldPath("rc", e), increment(1));
+      else b.update(postRef, new FieldPath("rc", e), increment(1));
+    }
+    b.commit().catch(err => alert("לא הצלחנו לשמור: " + err.message));
+    panel.hidden = true;
+  };
+  const draw = () => {
+    const list = (!mine || EMOJIS.includes(mine)) ? EMOJIS : [...EMOJIS, mine];
+    const plus = el("button", {textContent: "➕"}); plus.onclick = () => panel.hidden = !panel.hidden;
+    rx.replaceChildren(...list.map(e => { const bt = el("button", {textContent: e, className: mine === e ? "on" : ""}); bt.onclick = () => pick(e); return bt; }), plus);
+  };
+  const inp = el("input", {className: "ei", placeholder: "הקלד או הדבק כל אימוג'י"});
+  const go = el("button", {textContent: "שלח"}); go.onclick = () => { pick(inp.value); inp.value = ""; };
+  panel.append(inp, go, ...MORE.map(e => { const bt = el("button", {textContent: e}); bt.onclick = () => pick(e); return bt; }));
+  c._u = onSnapshot(myref, s => { mine = s.exists() ? s.data().emoji : null; draw(); });
+  c.append(rx, panel);
+
+  c._st = el("span", {textContent: stats(p)});
+  const st = el("div", {className: "st"}, c._st); c.append(st);
+  if (isAdmin) {
+    const who = el("button", {textContent: "מי צפה והגיב"}); who.onclick = () => showDetails(id);
+    const del = el("button", {textContent: "מחיקה"});
+    del.onclick = async () => { if (confirm("למחוק את העדכון?")) await deleteDoc(postRef); };
+    st.append(who, del);
+  }
+  if (!getSeen().has(id)) io.observe(c);
+  return c;
+}
+
+async function showDetails(id) {
+  const [v, r] = await Promise.all([getDocs(collection(db, "posts", id, "views")), getDocs(collection(db, "posts", id, "reactions"))]);
+  const mb = $("mbody"); mb.replaceChildren(el("h3", {textContent: `צפו (${v.size})`}));
+  const u1 = el("ul"); v.forEach(d => u1.append(el("li", {textContent: `${d.data().email} - ${fmt(d.data().at)}`}))); mb.append(u1);
+  mb.append(el("h3", {textContent: `תגובות (${r.size})`}));
+  const u2 = el("ul"); r.forEach(d => u2.append(el("li", {textContent: `${d.data().emoji} ${d.data().email}`}))); mb.append(u2);
+  const x = el("button", {textContent: "סגירה"}); x.onclick = () => $("modal").style.display = "none"; mb.append(x);
+  $("modal").style.display = "flex";
+}
+$("modal").onclick = e => { if (e.target.id === "modal") $("modal").style.display = "none"; };
+
+$("tabs").onclick = async e => {
+  const t = e.target.dataset?.t; if (!t) return;
+  [...$("tabs").children].forEach(b => b.classList.toggle("on", b.dataset.t === t));
+  $("feed").hidden = $("compose").hidden = t !== "feed"; $("visitors").hidden = t !== "vis";
+  if (t === "vis") {
+    const s = await getDocs(query(collection(db, "visitors"), orderBy("lastSeen", "desc")));
+    const box = $("visitors"); box.replaceChildren(el("p", {className: "meta", textContent: `${s.size} אנשים נכנסו`}));
+    s.forEach(d => { const v = d.data(); box.append(el("div", {className: "card", textContent: `${v.name} · ${v.email} · כניסה אחרונה: ${fmt(v.lastSeen)} · ${v.visits || 1} כניסות`})); });
+  }
+};
+
+$("pub").onclick = async () => {
+  const text = $("text").value.trim(), url = $("link").value.trim();
+  if (!text && !url) return;
+  if (url && !/^https:\/\//.test(url)) return alert("הקישור חייב להתחיל ב-https://");
+  $("pub").disabled = true;
+  try {
+    await addDoc(collection(db, "posts"), {text, media: url || null, mtype: $("mtype").value, createdAt: serverTimestamp(), vc: 0, rc: {}});
+    $("text").value = ""; $("link").value = "";
+  } catch (e) { alert("הפרסום נכשל: " + e.message); }
+  $("pub").disabled = false;
+};
+</script>
+</body>
+</html>
