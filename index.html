@@ -6,53 +6,60 @@
 <title>הערוץ שלי</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#eaf0f3;--card:#fff;--ink:#13303b;--mut:#5d7580;--acc:#0b7a85;--line:#d5e0e5}
+:root{--bg:#fdf3ec;--card:#fff;--ink:#2a1038;--mut:#7a6a85;--acc:#dd2476;--yel:#ffc93c;--line:#f0e0e6;
+--grad:linear-gradient(135deg,#ff5733 0%,#dd2476 52%,#7b2ff7 100%)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Heebo,Arial,sans-serif;line-height:1.55}
-header{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
-header h1{margin:0;font-size:20px;font-weight:800;flex:1}
-header img{width:32px;height:32px;border-radius:50%}
-button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:var(--acc);color:#fff;font-weight:500}
-button.ghost{background:transparent;color:inherit;border:1px solid currentColor}
-button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
-main{max-width:620px;margin:0 auto;padding:16px}
-#login{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
-#login h2{font-size:34px;margin:0;font-weight:800}
-#login small{color:var(--mut)}
-.card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+header{background:var(--grad);color:#fff;padding:18px 20px 30px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header .t{flex:1;display:flex;align-items:center;gap:14px;min-width:0}
+header h1{margin:0;font-size:32px;font-weight:800;letter-spacing:-.5px}
+#logo{width:52px;height:52px;border-radius:50%;border:3px solid #ffffff88;object-fit:cover}
+#avatar{width:40px;height:40px;border-radius:50%;border:2px solid #fff}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:9px 18px;background:var(--acc);color:#fff;font-weight:700}
+button.dark{background:var(--ink);color:#fff;border-radius:14px;padding:9px 14px}
+button:disabled{opacity:.6}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+main{max-width:640px;margin:-14px auto 0;padding:0 16px 40px;position:relative}
+#login{background:var(--grad);color:#fff;border-radius:28px;margin-top:20px;min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
+#login h2{font-size:42px;margin:0;font-weight:800}
+#login p{margin:0;font-size:18px}
+#login button{background:#fff;color:var(--acc);font-size:18px;padding:14px 30px;box-shadow:0 8px 24px #0003}
+#login small{opacity:.85}
+.card{background:var(--card);border-radius:28px;padding:18px;margin-bottom:16px;box-shadow:0 6px 22px #2a103814}
 .meta{color:var(--mut);font-size:13px}
-.txt{white-space:pre-wrap;font-size:17px;margin:6px 0 10px}
-.card img.m,.card video.m{width:100%;max-height:70vh;border-radius:10px;background:#000;object-fit:contain}
-iframe.m{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
+.txt{white-space:pre-wrap;font-size:18px;margin:6px 0 10px}
+.card img.m,.card video.m{width:100%;max-height:70vh;border-radius:20px;background:#000;object-fit:contain}
+iframe.m{width:100%;aspect-ratio:16/9;border:0;border-radius:20px;background:#000}
 .rx{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.rx button{background:#f1f6f8;color:var(--ink);border:1px solid var(--line);padding:4px 10px}
-.rx button.on{background:#d3eef0;border-color:var(--acc)}
-.st{display:flex;gap:12px;margin-top:10px;font-size:14px;color:var(--mut);align-items:center;flex-wrap:wrap}
-.st button{background:transparent;color:var(--mut);border:1px solid var(--line);padding:2px 10px;font-size:13px}
-textarea,.in{width:100%;font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px}
+.rx button{background:#fbeef2;color:var(--ink);padding:5px 12px;font-weight:500}
+.rx button.on{background:var(--acc);color:#fff}
+.st{display:flex;gap:12px;margin-top:12px;font-size:14px;color:var(--mut);align-items:center;flex-wrap:wrap}
+.st button{background:transparent;color:var(--mut);border:1px solid var(--line);padding:2px 12px;font-size:13px;font-weight:500}
+.dl{display:flex;gap:16px}
+.lnk{display:inline-block;margin-top:8px;font-size:14px;color:var(--acc);font-weight:700;text-decoration:none}
+textarea,.in{width:100%;font:inherit;border:1px solid var(--line);border-radius:18px;padding:12px;background:#fffaf7}
 textarea{min-height:80px;resize:vertical}
-.lnk{display:inline-block;margin-top:6px;font-size:13px;color:var(--acc)}
-.ei{flex:1;min-width:150px;font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px}
+.ei{flex:1;min-width:150px;font:inherit;padding:6px 12px;border:1px solid var(--line);border-radius:999px}
 .row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-#modal{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
-#modal>div{background:#fff;border-radius:14px;max-width:520px;width:100%;max-height:80vh;overflow:auto;padding:18px}
-#modal li{padding:4px 0;border-bottom:1px solid var(--line);font-size:14px}
+#modal{position:fixed;inset:0;background:#2a1038aa;display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+#modal>div{background:#fff;border-radius:28px;max-width:520px;width:100%;max-height:80vh;overflow:auto;padding:22px}
+#modal li{padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}
 ul{padding:0;list-style:none;margin:6px 0 14px}
-.tabs{display:flex;gap:8px;margin-bottom:12px}
-.tabs button{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.tabs{display:flex;gap:8px;margin:20px 0 14px}
+.tabs button{background:#fff;color:var(--ink);box-shadow:0 2px 10px #2a103812}
 .tabs button.on{background:var(--ink);color:#fff}
 </style>
 </head>
 <body>
 <header>
-  <h1 id="title">הערוץ שלי</h1>
+  <div class="t"><img id="logo" alt="" hidden><h1 id="title">הערוץ שלי</h1></div>
   <img id="avatar" alt="" hidden>
-  <button class="ghost" id="out" hidden>יציאה</button>
+  <button class="dark" id="out" hidden>יציאה</button>
 </header>
 <main>
   <section id="login" hidden>
-    <h2>הערוץ שלי</h2>
+    <h2 id="ltitle">הערוץ שלי</h2>
     <p>כדי לצפות בעדכונים, התחבר עם חשבון גוגל.</p>
     <button id="in">התחברות עם Google</button>
     <small>בכניסה נשמרים כתובת המייל שלך וצפיות בעדכונים, ורק מנהל הערוץ רואה אותם.</small>
@@ -65,10 +72,9 @@ ul{padding:0;list-style:none;margin:6px 0 14px}
     <div id="compose" class="card" hidden>
       <textarea id="text" placeholder="כתוב עדכון חדש..."></textarea>
       <div class="row">
-        <input class="in" id="link" style="flex:1" placeholder="קישור לתמונה או סרטון (דרייב / יוטיוב) - לא חובה" dir="ltr">
+        <input class="in" id="link" style="flex:1" placeholder="קישור לתמונה, סרטון או קובץ (דרייב / יוטיוב) - לא חובה" dir="ltr">
         <select id="mtype" class="in" style="width:auto"><option value="video">סרטון</option><option value="image">תמונה</option><option value="file">קובץ</option></select>
       </div>
-      <div class="row"><input type="file" id="file" accept="image/*,video/*,.pdf"><span id="up" class="meta"></span></div>
       <div class="row"><button id="pub" style="margin-inline-start:auto">פרסום</button></div>
     </div>
     <p id="empty" class="meta" hidden>עדיין אין עדכונים.</p>
@@ -85,18 +91,22 @@ import {getFirestore,collection,doc,getDoc,setDoc,addDoc,deleteDoc,getDocs,onSna
 
 /* ====== מלא כאן ====== */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT",
-  messagingSenderId: "...",
-  appId: "..."
+  apiKey: "AIzaSyD_MsRdNkGuebM8QSQ5R1Pv1p5l36kK_wA",
+  authDomain: "my-channel-21a1e.firebaseapp.com",
+  projectId: "my-channel-21a1e",
+  storageBucket: "my-channel-21a1e.firebasestorage.app",
+  messagingSenderId: "723883686401",
+  appId: "1:723883686401:web:9f196711bbb4f6917ede00",
+  measurementId: "G-EXN3F37WC8"
 };
-const ADMIN_EMAIL = "you@gmail.com";   // חייב להיות זהה לקובץ firestore.rules
+const LOGO_URL = "";   // קישור https ללוגו עגול (אופציונלי)
+const ADMIN_EMAIL = "yaele9090@gmail.com";   // חייב להיות זהה לקובץ firestore.rules
 const CHANNEL_NAME = "הערוץ שלי";
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/XXXX/exec";  // מ-Apps Script (ראה README)
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzsPII74wLhCVq2vHwDHvrkw6CExlsE2f2-xXjsv8kfLSvnLV2CPMvL1dQG0KaLGq4pGA/exec";  // מ-Apps Script (ראה README)
 const EMOJIS = ["👍","❤️","😂","😮","🙏"];
 const MORE = ["😀","😁","😅","🤣","😍","🥰","😘","😎","🤩","🥳","😢","😭","😡","🤔","🙄","😴","🤯","😇","🤗","🙌","👏","💪","🤝","✌️","👌","🔥","✨","🎉","💯","💔","💙","💚","🌹","⭐","🌟","☀️","🌈","🍎","☕","🎁","🙈"];
 /* ===================== */
+
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app), db = getFirestore(app);
@@ -104,7 +114,8 @@ const $ = id => document.getElementById(id);
 const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); kids.forEach(k => e.append(k)); return e; };
 const fmt = t => t?.toDate ? t.toDate().toLocaleString("he-IL") : "עכשיו";
 let me = null, isAdmin = false, unsubFeed = null; const cards = new Map();
-document.title = CHANNEL_NAME; $("title").textContent = CHANNEL_NAME;
+document.title = CHANNEL_NAME; $("title").textContent = CHANNEL_NAME; $("ltitle").textContent = CHANNEL_NAME;
+if (LOGO_URL) { $("logo").src = LOGO_URL; $("logo").hidden = false; }
 
 /* מונים ציבוריים: בלי מיילים */
 const stats = p => {
@@ -130,12 +141,20 @@ function mediaBlock(p) {
   const m = mediaEl(p), drive = u.includes("drive.google.com");
   if (!m && !drive && p.mtype !== "file") return null;
   const w = el("div"); if (m) w.append(m);
-  if (drive || p.mtype === "file") w.append(el("a", {className: "lnk", href: u, target: "_blank", rel: "noopener", textContent: p.mtype === "file" ? "פתח את הקובץ" : "לא נטען? פתח בדרייב"}));
+  const row = el("div", {className: "dl"});
+  if (drive || p.mtype === "file") row.append(el("a", {className: "lnk", href: u, target: "_blank", rel: "noopener", textContent: p.mtype === "file" ? "פתח את הקובץ" : "פתח בדרייב"}));
+  const id = (u.match(/\/d\/([\w-]+)/) || u.match(/[?&]id=([\w-]+)/) || [])[1];
+  if (drive && id) row.append(el("a", {className: "lnk", href: `https://drive.google.com/uc?export=download&id=${id}`, textContent: "⬇ הורדה"}));
+  if (row.children.length) w.append(row);
   return w;
 }
 async function callScript(payload) {
-  const r = await fetch(APPS_SCRIPT_URL, {method: "POST", body: JSON.stringify({...payload, idToken: await me.getIdToken()})});
-  return r.json();
+  if (APPS_SCRIPT_URL.includes("XXXX")) throw new Error("עוד לא הוגדר Apps Script (ראה README, שלב ב)");
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 120000);
+  try {
+    const r = await fetch(APPS_SCRIPT_URL, {method: "POST", signal: ctl.signal, body: JSON.stringify({...payload, idToken: await me.getIdToken()})});
+    return await r.json();
+  } finally { clearTimeout(t); }
 }
 async function joinFolder(user) {
   if (APPS_SCRIPT_URL.includes("XXXX")) return;
@@ -267,30 +286,16 @@ $("tabs").onclick = async e => {
   }
 };
 
-$("file").onchange = () => {
-  const f = $("file").files[0]; if (!f) return;
-  $("mtype").value = f.type.startsWith("video") ? "video" : f.type.startsWith("image") ? "image" : "file";
-};
-
 $("pub").onclick = async () => {
-  const text = $("text").value.trim(), f = $("file").files[0];
-  let url = $("link").value.trim();
-  if (!text && !url && !f) return;
+  const text = $("text").value.trim(), url = $("link").value.trim();
+  if (!text && !url) return;
   if (url && !/^https:\/\//.test(url)) return alert("הקישור חייב להתחיל ב-https://");
-  if (f && f.size > 25 * 1024 * 1024) return alert("הקובץ גדול מ-25MB. העלה אותו ידנית לתיקייה בדרייב והדבק את הקישור.");
   $("pub").disabled = true;
   try {
-    if (f) {
-      $("up").textContent = "מעלה לדרייב...";
-      const data = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = no; r.readAsDataURL(f); });
-      const r = await callScript({action: "upload", name: f.name, mime: f.type || "application/octet-stream", data});
-      if (!r.ok) throw new Error(r.error || "ההעלאה נכשלה");
-      url = `https://drive.google.com/file/d/${r.id}/view`;
-    }
     await addDoc(collection(db, "posts"), {text, media: url || null, mtype: $("mtype").value, createdAt: serverTimestamp(), vc: 0, rc: {}});
-    $("text").value = ""; $("link").value = ""; $("file").value = "";
-  } catch (e) { alert("הפרסום נכשל: " + e.message + "\nאם נגמרה המכסה, העלה ידנית לתיקייה בדרייב והדבק קישור."); }
-  $("up").textContent = ""; $("pub").disabled = false;
+    $("text").value = ""; $("link").value = "";
+  } catch (e) { alert("הפרסום נכשל: " + e.message); }
+  $("pub").disabled = false;
 };
 </script>
 </body>
